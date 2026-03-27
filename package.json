@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "vite build --watch",
-    "build": "vite build && cp manifest.json dist/",
+    "build": "vite build && shx cp manifest.json dist/",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/chrome": "0.0.268",
+    "shx": "0.4.0",
     "typescript": "5.4.5",
     "vite": "6.4.1"
   }
