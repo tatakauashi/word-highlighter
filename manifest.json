@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Word Highlighter",
+  "version": "1.0.0",
+  "description": "AIチャット画面上でワードをハイライト表示する拡張機能",
+
+  "permissions": ["storage"],
+
+  "host_permissions": [
+    "https://claude.ai/*",
+    "https://chat.openai.com/*",
+    "https://chatgpt.com/*",
+    "https://gemini.google.com/*"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://claude.ai/*",
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*"
+      ],
+      "js": ["content/highlighter.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "background": {
+    "service_worker": "background/service_worker.js",
+    "type": "module"
+  },
+
+  "options_page": "options/options.html",
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none';"
+  }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word Highlighter — 設定</title>
+    <link rel="stylesheet" href="./options.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>ワード設定</h1>
+
+      <section class="add-section">
+        <label for="wordInput">ワードを追加</label>
+        <div class="input-row">
+          <input
+            id="wordInput"
+            type="text"
+            maxlength="100"
+            placeholder="例: 田中太郎"
+            autocomplete="off"
+          />
+          <button id="addBtn" type="button">追加</button>
+        </div>
+        <p id="errorMsg" class="error" aria-live="polite"></p>
+        <p class="hint">最大 50ワード・1ワード 100文字まで</p>
+      </section>
+
+      <section class="list-section">
+        <h2>登録済みワード <span id="countBadge" class="badge">0 / 50</span></h2>
+        <ul id="wordList" aria-label="ワード一覧"></ul>
+        <p id="emptyMsg" class="empty">登録されたワードはありません</p>
+      </section>
+    </div>
+    <script type="module" src="./options.ts"></script>
+  </body>
+</html>
