@@ -1,6 +1,7 @@
 const MAX_WORDS = 50
 const MAX_WORD_LENGTH = 100
 const STORAGE_KEY = 'specWords'
+const ENABLED_KEY = 'highlighterEnabled'
 
 const wordInput = document.getElementById('wordInput') as HTMLInputElement
 const addBtn = document.getElementById('addBtn') as HTMLButtonElement
@@ -8,6 +9,7 @@ const wordList = document.getElementById('wordList') as HTMLUListElement
 const errorMsg = document.getElementById('errorMsg') as HTMLParagraphElement
 const emptyMsg = document.getElementById('emptyMsg') as HTMLParagraphElement
 const countBadge = document.getElementById('countBadge') as HTMLSpanElement
+const enabledToggle = document.getElementById('enabledToggle') as HTMLButtonElement
 
 function loadWords(): Promise<string[]> {
   return new Promise((resolve) => {
@@ -101,14 +103,36 @@ async function handleDelete(word: string): Promise<void> {
   clearError()
 }
 
+function setToggleState(enabled: boolean): void {
+  enabledToggle.setAttribute('aria-checked', String(enabled))
+}
+
+async function handleToggle(): Promise<void> {
+  const current = enabledToggle.getAttribute('aria-checked') === 'true'
+  const next = !current
+  setToggleState(next)
+  await new Promise<void>((resolve) => {
+    chrome.storage.sync.set({ [ENABLED_KEY]: next }, resolve)
+  })
+}
+
 async function init(): Promise<void> {
-  const words = await loadWords()
+  const [words, result] = await Promise.all([
+    loadWords(),
+    new Promise<boolean>((resolve) => {
+      chrome.storage.sync.get({ [ENABLED_KEY]: true }, (r) => {
+        resolve(r[ENABLED_KEY] as boolean)
+      })
+    }),
+  ])
   renderList(words)
+  setToggleState(result)
 
   addBtn.addEventListener('click', () => void handleAdd())
   wordInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') void handleAdd()
   })
+  enabledToggle.addEventListener('click', () => void handleToggle())
 }
 
 void init()

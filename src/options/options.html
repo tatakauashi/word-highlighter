@@ -31,6 +31,21 @@
         <ul id="wordList" aria-label="ワード一覧"></ul>
         <p id="emptyMsg" class="empty">登録されたワードはありません</p>
       </section>
+
+      <section class="toggle-section">
+        <div class="toggle-row">
+          <span class="toggle-label">ハイライト機能</span>
+          <button
+            id="enabledToggle"
+            type="button"
+            class="toggle-btn"
+            role="switch"
+            aria-checked="true"
+          >
+            <span class="toggle-knob"></span>
+          </button>
+        </div>
+      </section>
     </div>
     <script type="module" src="./options.ts"></script>
   </body>

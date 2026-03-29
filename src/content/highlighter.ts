@@ -8,6 +8,7 @@
  */
 
 const STORAGE_KEY = 'specWords'
+const ENABLED_KEY = 'highlighterEnabled'
 const HIGHLIGHT_CLASS = 'word-highlight'
 const CURRENT_CLASS = 'word-highlight-current'
 const STYLE_ID = 'word-highlighter-style'
@@ -16,7 +17,7 @@ const NAVIGATOR_ID = 'word-navigator'
 // ハイライト対象から除外する先祖要素セレクター。
 // サイドバー・ナビゲーション・ヘッダー・フッターなどのUI要素を対象外にする。
 // セレクターを変更することで除外範囲を調整できる。
-const EXCLUDED_ANCESTOR_SELECTORS = 'nav, aside, header, footer'
+const EXCLUDED_ANCESTOR_SELECTORS = 'nav, aside, header, footer, [contenteditable="true"]'
 
 // ---------------------------------------------------------------------------
 // スタイル注入
@@ -347,6 +348,7 @@ function disconnectObserver(): void {
 // ---------------------------------------------------------------------------
 
 let currentWords: string[] = []
+let isEnabled = true
 
 /** ページ全体にハイライトを適用し直す。
  *  Observer を一時停止することで自己トリガーループを防ぐ。 */
@@ -407,19 +409,41 @@ function startObserver(): void {
   connectObserver()
 }
 
+function disableHighlighter(): void {
+  disconnectObserver()
+  removeAllHighlights()
+  allMarks = []
+  currentIndex = -1
+  document.getElementById(NAVIGATOR_ID)?.remove()
+}
+
 async function init(): Promise<void> {
   injectStyle()
 
-  const result = await chrome.storage.sync.get({ [STORAGE_KEY]: [] })
+  const result = await chrome.storage.sync.get({ [STORAGE_KEY]: [], [ENABLED_KEY]: true })
   currentWords = result[STORAGE_KEY] as string[]
+  isEnabled = result[ENABLED_KEY] as boolean
 
-  applyHighlights()
-  startObserver()
+  if (isEnabled) {
+    applyHighlights()
+    startObserver()
+  }
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== 'sync' || !(STORAGE_KEY in changes)) return
-    currentWords = (changes[STORAGE_KEY].newValue as string[]) ?? []
-    applyHighlights()
+    if (area !== 'sync') return
+    if (ENABLED_KEY in changes) {
+      isEnabled = (changes[ENABLED_KEY].newValue as boolean) ?? true
+      if (isEnabled) {
+        applyHighlights()
+        startObserver()
+      } else {
+        disableHighlighter()
+      }
+    }
+    if (STORAGE_KEY in changes && isEnabled) {
+      currentWords = (changes[STORAGE_KEY].newValue as string[]) ?? []
+      applyHighlights()
+    }
   })
 }
 
