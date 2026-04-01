@@ -97,6 +97,9 @@ function injectStyle(): void {
     '  opacity: 0.35;',
     '  cursor: default;',
     '}',
+    `#${NAVIGATOR_ID}.has-matches {`,
+    '  background: rgba(180, 30, 30, 0.92);',
+    '}',
   ].join('\n')
   document.head.appendChild(style)
 }
@@ -295,6 +298,7 @@ function updateNavigatorDisplay(): void {
   count.textContent = currentIndex >= 0 ? `${currentIndex + 1} / ${total}件` : `${total}件`
   prevBtn.disabled = !hasMatches
   nextBtn.disabled = !hasMatches
+  nav.classList.toggle('has-matches', hasMatches)
 }
 
 function navigateTo(index: number): void {
